@@ -1,0 +1,18 @@
+[gd_scene load_steps=3 format=3 uid="uid://h0nwgjnoaqb"]
+
+[ext_resource type="Script" path="res://addons/Vylox Extension/Classes/VCharacter2D/VCharacter2D.gd" id="2_p3jpa"]
+[ext_resource type="Texture2D" uid="uid://cix738213l2ou" path="res://icon.svg" id="3_ayh3b"]
+
+[node name="VCharacter2D" type="Node2D"]
+script = ExtResource("2_p3jpa")
+character_option = 1
+tile_size = 0
+enable_gravity = false
+gravity_direction = Vector2(0, 1)
+character_gravity = 0
+gravity_force = 0.0
+gravity_build_up_on_floor = false
+
+[node name="Icon" type="Sprite2D" parent="."]
+scale = Vector2(0.25, 0.25)
+texture = ExtResource("3_ayh3b")

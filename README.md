@@ -1,4 +1,4 @@
-# Vylox Extension
+# Vylox Extension (Beta State)
 
 This Repository is a Godot 4 Extension, which it's purpose is to make Godot's game development easier, faster and more compatible.
 #

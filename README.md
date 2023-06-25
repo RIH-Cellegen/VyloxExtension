@@ -1,16 +1,8 @@
-# Inspector Extender
+# Vylox Extension
 
-A plugin for Godot 4 to extend the Inspector using just comments above properties. Nodes, Resources, and even non-tool scripts supported!
+This Repository is a Godot 4 Extension, which it's purpose is to make Godot's game development easier, faster and more compatible.
 
-It allows the user to do this:
-
-![](./images/screen0.png)
-
-...with just this.
-
-![](./images/screen1.png)
-
-Comments must be placed any number of lines before the property they must be applied to (*place anything in between, just not other properties*)
+[br]
 
 Supported commentributes:
 

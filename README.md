@@ -1,79 +1,26 @@
 # Vylox Extension
 
 This Repository is a Godot 4 Extension, which it's purpose is to make Godot's game development easier, faster and more compatible.
-
-[br]
-
-Supported commentributes:
-
-# Extras
-
-## @@message(`message_func`), @@message_warning(`message_func`), @@message_error(`message_func`)
-
-Call `message_func` that returns a message string to display a message. When the function returns and empty string, no message is displayed.
-
-## @@buttons(`params`)
-
-Displays a button group. The `params`, comma-separated, must contain expressions (*like `set_position(position + Vector2(9, 20))`*), preceded by a name (*inside quotation marks `" "`*) and optionally a color code (*like `#009900`*)
-
-To display a red "Reset" button that calls `_reset`, write: `# @@buttons("Reset", #990000, _reset())`.
-
-**Note:** Assignment `=` `+=` `*=` `-=` `/=` not supported, use setter functions instead.
-
-**Note:** Translating nodes in viewport has unpredictable behaviour. Clues on fixes appreciated.
-
-# Tables
-
-**Note:** if array is empty, properties will be pinned. This is done automatically and required for it to work properly.
-
-## @@resource_table(`properties...`)
-
-Displays list of resources as a table. Optionally, list `properties` to display.
-
-## @@dict_table(`properties...`)
-
-Displays list of dictionaries as a table. The `properties`, comma-separated, must be in format of `key : type`, where `key` is the dictionary's key and `type` is the name of its datatype.
-
-To store a table of dictionaries each containing a number `a`, a 2d-vector `b` and a texture `c`, write `# @@dict_table( a : int, b : Vector2, c : Texture2D)`.
-
-## @@array_table(`properties...`)
-
-Displays list of arrays as a table. Similar to `# @@dict_table`.
-
-## @@multi_array_table(`properties_to_show...`)
-
-Displays several typed arrays as a table. `properties_to_show` is a comma-separated list of properties that store arrays.
-
-Arrays must have a type hint (`var array : Array[float]`, not `var array : Array`)
-
-# Other
-
-## @@scroll_box(`height`)
-
-Puts a table into a scrollable container of maximum size `height`.
-
-## @@show_if(`expression`)
-
-Hides property if `expression` evaluates to `false`.
-
-## @@value_dropdown(`expression`)
-
-An option button that evaluates `expression` to get values to choose from. The expression may return an Array or a Dictionary.
-
-## @@tabs()
-
-Displays enum as tabs. Can be used to speed up enum switching, or with `@@show_if` to only show a group when enum is of a specific value.
-
-
-# More commentributes coming soon.
-
 #
-Made by Don Tnowe in 2023.
+## Usage
+Vylox Extension uses a 3 custom systems called **Core**, **Gear** and **Iron**.
 
-[My Website](https://redbladegames.netlify.app)
+**• Core** - Scripts and Tools, which let you use advanced functions, that might help developing.
 
-[Itch](https://don-tnowe.itch.io)
+**• Gear** - Custom Classes, which work together with all the other **Gear** categorized Custom Classes.
 
-[Twitter](https://twitter.com/don_tnowe)
+**• Iron** - Resources, which gives benefit for **Gear** categorized Custom Classes.
 
-Copying and Modification is allowed in accordance to the MIT license, full text is included.
+# Branches
+Vylox Extension is divided into 2 parts:
+
+**• Stable** Branch which includes a more stable and compatible version of the Extension.
+
+**• Nightly** Branch which includes the latest changes of the Extension. This Branch may have unexpected bugs or issues. (Not recommended to use on a real Project)
+
+# Installation
+• Clone this Repository and save it to a Directory, where you can access it with Godot 4.
+
+• Inside **Godot's Project Manager**, Scan the Directory, where you put the cloned Repository.
+
+• If Godot has found the Project, edit it.

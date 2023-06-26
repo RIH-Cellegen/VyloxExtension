@@ -7,7 +7,7 @@ Vylox Extension uses a 3 custom systems called **Core**, **Gear** and **Iron**.
 
 **• Core** - Scripts and Tools, which let you use advanced functions, that might help developing.
 
-**• Gear** - Custom Classes, which work together with all the other **Gear** categorized Custom Classes.
+**• Gear** - Custom Classes, which work together with all the other **Gear** categorized Custom Classes and can access **Core** categorized Scripts and Tools.
 
 **• Iron** - Resources, which gives benefit for **Gear** categorized Custom Classes.
 

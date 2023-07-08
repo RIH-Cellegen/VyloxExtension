@@ -13,7 +13,7 @@ var vevent_path = FileAccess.open("res://addons/Vylox Extension/Core/VEvent/VEve
 
 var plugin_starts: int = plugin_load.Deloaded
 var count_loads: int = 0
-var max_loads: int = 4
+var max_loads: int = 3
 var plugin_loaded_functions: Array = []
 
 func _enter_tree():
@@ -53,14 +53,12 @@ func _process(delta):
 					count_loads += 1
 					return
 				1: 
-					pass # Empty space
-				2: 
 					if vevent_path != null:
 						add_autoload_singleton("VEvent", vevent_path)
 						plugin_loaded_functions[count_loads] = "VEvent"
 					count_loads += 1
 					return
-				3: 
+				2: 
 					if instanced_vextension_tab != null:
 						add_control_to_bottom_panel(instanced_vextension_tab, "VInput")
 						plugin_loaded_functions[count_loads] = "Vylox Extension Tab"
@@ -78,6 +76,5 @@ func _exit_tree():
 				match i:
 					0: remove_control_from_bottom_panel(instanced_vextension_tab)
 					1: remove_autoload_singleton("VEvent")
-					2: remove_autoload_singleton("VInput")
-					3: remove_autoload_singleton("VScript")
+					2: remove_autoload_singleton("VScript")
 		plugin_starts = plugin_load.Deloaded

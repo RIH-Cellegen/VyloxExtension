@@ -1,5 +1,5 @@
 @tool
-extends VScript
+extends "res://addons/Vylox Extension/Core/VScript/VScript.gd"
 class_name VCharacter2D
 
 enum enum_character_option {None, Platformer, TopDown, Isometric}

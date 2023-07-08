@@ -1,4 +1,4 @@
-extends VScript
+extends "res://addons/Vylox Extension/Core/VScript/VScript.gd"
 class_name VInspector
 
 @export var properties: Array

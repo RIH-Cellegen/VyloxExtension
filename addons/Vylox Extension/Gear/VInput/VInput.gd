@@ -14,6 +14,22 @@ var mouse_pressed: Array = []
 var keyboard_pressed: Array = []
 var joystick_pressed: Array = []
 
+var mouse_active: bool = true:
+	set(value):
+		mouse_active = value
+		if keyboard_active != false: keyboard_active = false
+		if joystick_active != false: joystick_active = false
+var keyboard_active: bool = false:
+	set(value):
+		keyboard_active = value
+		if mouse_active != false: mouse_active = false
+		if joystick_active != false: joystick_active = false
+var joystick_active: bool = false:
+	set(value):
+		joystick_active = value
+		if mouse_active != false: mouse_active = false
+		if keyboard_active != false: keyboard_active = false
+
 var mouse_action: Array = []
 var mouse_current_doubleclick_time: PackedFloat64Array = []
 var mouse_current_doubleclick_amount: PackedInt64Array = []
@@ -63,41 +79,38 @@ var current_device: int:
 				Device.Joystick:
 					set_mouse_values()
 					set_keyboard_values()
+var default_device: int = 0
 
-func apply_mouse_pressed(delta):
-	var array = [Input.is_action_pressed("mouse_left"),Input.is_action_pressed("mouse_right"),Input.is_action_pressed("mouse_middle"),Input.is_action_pressed("mouse_wheel_up"),Input.is_action_pressed("mouse_wheel_down"),Input.is_action_pressed("mouse_wheel_left"),Input.is_action_pressed("mouse_wheel_right"),Input.is_action_pressed("mouse_xbutton_1"),Input.is_action_pressed("mouse_xbutton_2")]
-	if mouse_pressed != array:
-		mouse_pressed = array
-	for position in mouse_pressed.size():
-		calculate_mouse(delta, position)
-func apply_joystick_pressed(delta):
-	var array = [Input.is_action_pressed("joystick_a"),Input.is_action_pressed("joystick_b"),Input.is_action_pressed("joystick_x"),Input.is_action_pressed("joystick_y"),Input.is_action_pressed("joystick_lb"),Input.is_action_pressed("joystick_rb"),Input.is_action_pressed("joystick_lt"),Input.is_action_pressed("joystick_rt"),Input.is_action_pressed("joystick_start"),Input.is_action_pressed("joystick_back"),Input.is_action_pressed("joystick_connection_button"),Input.is_action_pressed("joystick_laxis_button"),Input.is_action_pressed("joystick_raxis_button"),Input.is_action_pressed("joystick_dpad_up"),Input.is_action_pressed("joystick_dpad_down"),Input.is_action_pressed("joystick_dpad_left"),Input.is_action_pressed("joystick_dpad_right"),Input.is_action_pressed("joystick_laxis_up"),Input.is_action_pressed("joystick_laxis_down"),Input.is_action_pressed("joystick_laxis_left"),Input.is_action_pressed("joystick_laxis_right"),Input.is_action_pressed("joystick_raxis_up"),Input.is_action_pressed("joystick_raxis_down"),Input.is_action_pressed("joystick_raxis_left"),Input.is_action_pressed("joystick_raxis_right")]
-	if joystick_pressed != array:
-		joystick_pressed = array
-	var array_motion: Array = [Input.get_action_raw_strength("joystick_lt"), Input.get_action_raw_strength("joystick_rt"), Input.get_action_raw_strength("joystick_laxis_up"), Input.get_action_raw_strength("joystick_laxis_down"), Input.get_action_raw_strength("joystick_laxis_left"), Input.get_action_raw_strength("joystick_laxis_right"), Input.get_action_raw_strength("joystick_raxis_up"), Input.get_action_raw_strength("joystick_raxis_down"), Input.get_action_raw_strength("joystick_raxis_left"), Input.get_action_raw_strength("joystick_raxis_right"), Vector2(Input.get_action_raw_strength("joystick_laxis_right") - Input.get_action_raw_strength("joystick_laxis_left"), Input.get_action_raw_strength("joystick_laxis_up") - Input.get_action_raw_strength("joystick_laxis_down")), Vector2(Input.get_action_raw_strength("joystick_raxis_right") - Input.get_action_raw_strength("joystick_raxis_left"), Input.get_action_raw_strength("joystick_raxis_up") - Input.get_action_raw_strength("joystick_raxis_down"))]
-	if joystick_motion != array_motion:
-		joystick_motion = array_motion
-		if joystick_motion[Joystick_motion.LAXIS].x < 0.001 and joystick_motion[Joystick_motion.LAXIS].x > -0.001:
-			joystick_motion[Joystick_motion.LAXIS].x = 0
-		if joystick_motion[Joystick_motion.LAXIS].y < 0.001 and joystick_motion[Joystick_motion.LAXIS].y > -0.001:
-			joystick_motion[Joystick_motion.LAXIS].y = 0
-		if joystick_motion[Joystick_motion.RAXIS].x < 0.001 and joystick_motion[Joystick_motion.RAXIS].x > -0.001:
-			joystick_motion[Joystick_motion.RAXIS].x = 0
-		if joystick_motion[Joystick_motion.RAXIS].y < 0.001 and joystick_motion[Joystick_motion.RAXIS].y > -0.001:
-			joystick_motion[Joystick_motion.RAXIS].y = 0
+func apply_input_pressed(delta):
+	var mouse_array = [Input.is_action_pressed("mouse_left"),Input.is_action_pressed("mouse_right"),Input.is_action_pressed("mouse_middle"),Input.is_action_pressed("mouse_wheel_up"),Input.is_action_pressed("mouse_wheel_down"),Input.is_action_pressed("mouse_wheel_left"),Input.is_action_pressed("mouse_wheel_right"),Input.is_action_pressed("mouse_xbutton_1"),Input.is_action_pressed("mouse_xbutton_2")]
+	var mouse_motion_var = Input.get_last_mouse_velocity()
+	var joystick_array = [Input.is_action_pressed("joystick_a"),Input.is_action_pressed("joystick_b"),Input.is_action_pressed("joystick_x"),Input.is_action_pressed("joystick_y"),Input.is_action_pressed("joystick_lb"),Input.is_action_pressed("joystick_rb"),Input.is_action_pressed("joystick_lt"),Input.is_action_pressed("joystick_rt"),Input.is_action_pressed("joystick_start"),Input.is_action_pressed("joystick_back"),Input.is_action_pressed("joystick_connection_button"),Input.is_action_pressed("joystick_laxis_button"),Input.is_action_pressed("joystick_raxis_button"),Input.is_action_pressed("joystick_dpad_up"),Input.is_action_pressed("joystick_dpad_down"),Input.is_action_pressed("joystick_dpad_left"),Input.is_action_pressed("joystick_dpad_right"),Input.is_action_pressed("joystick_laxis_up"),Input.is_action_pressed("joystick_laxis_down"),Input.is_action_pressed("joystick_laxis_left"),Input.is_action_pressed("joystick_laxis_right"),Input.is_action_pressed("joystick_raxis_up"),Input.is_action_pressed("joystick_raxis_down"),Input.is_action_pressed("joystick_raxis_left"),Input.is_action_pressed("joystick_raxis_right")]
+	var joystick_motion_array = [Input.get_action_raw_strength("joystick_lt"), Input.get_action_raw_strength("joystick_rt"), Input.get_action_raw_strength("joystick_laxis_up"), Input.get_action_raw_strength("joystick_laxis_down"), Input.get_action_raw_strength("joystick_laxis_left"), Input.get_action_raw_strength("joystick_laxis_right"), Input.get_action_raw_strength("joystick_raxis_up"), Input.get_action_raw_strength("joystick_raxis_down"), Input.get_action_raw_strength("joystick_raxis_left"), Input.get_action_raw_strength("joystick_raxis_right"), Vector2(Input.get_action_raw_strength("joystick_laxis_right") - Input.get_action_raw_strength("joystick_laxis_left"), Input.get_action_raw_strength("joystick_laxis_up") - Input.get_action_raw_strength("joystick_laxis_down")), Vector2(Input.get_action_raw_strength("joystick_raxis_right") - Input.get_action_raw_strength("joystick_raxis_left"), Input.get_action_raw_strength("joystick_raxis_up") - Input.get_action_raw_strength("joystick_raxis_down"))]
+	var keyboard_array = [Input.is_key_pressed(KEY_NONE),Input.is_key_pressed(KEY_SPECIAL),Input.is_key_pressed(KEY_ESCAPE),Input.is_key_pressed(KEY_TAB),Input.is_key_pressed(KEY_BACKTAB),Input.is_key_pressed(KEY_BACKSPACE),Input.is_key_pressed(KEY_ENTER),Input.is_key_pressed(KEY_KP_ENTER),Input.is_key_pressed(KEY_INSERT),Input.is_key_pressed(KEY_DELETE),Input.is_key_pressed(KEY_PAUSE),Input.is_key_pressed(KEY_PRINT),Input.is_key_pressed(KEY_SYSREQ),Input.is_key_pressed(KEY_CLEAR),Input.is_key_pressed(KEY_HOME),Input.is_key_pressed(KEY_END),Input.is_key_pressed(KEY_LEFT),Input.is_key_pressed(KEY_UP),Input.is_key_pressed(KEY_RIGHT),Input.is_key_pressed(KEY_DOWN),Input.is_key_pressed(KEY_PAGEUP),Input.is_key_pressed(KEY_PAGEDOWN),Input.is_key_pressed(KEY_SHIFT),Input.is_key_pressed(KEY_CTRL),Input.is_key_pressed(KEY_META),Input.is_key_pressed(KEY_ALT),Input.is_key_pressed(KEY_CAPSLOCK),Input.is_key_pressed(KEY_NUMLOCK),Input.is_key_pressed(KEY_SCROLLLOCK),Input.is_key_pressed(KEY_F1),Input.is_key_pressed(KEY_F2),Input.is_key_pressed(KEY_F3),Input.is_key_pressed(KEY_F4),Input.is_key_pressed(KEY_F5),Input.is_key_pressed(KEY_F6),Input.is_key_pressed(KEY_F7),Input.is_key_pressed(KEY_F8),Input.is_key_pressed(KEY_F9),Input.is_key_pressed(KEY_F10),Input.is_key_pressed(KEY_F11),Input.is_key_pressed(KEY_F12),Input.is_key_pressed(KEY_F13),Input.is_key_pressed(KEY_F14),Input.is_key_pressed(KEY_F15),Input.is_key_pressed(KEY_F16),Input.is_key_pressed(KEY_F17),Input.is_key_pressed(KEY_F18),Input.is_key_pressed(KEY_F19),Input.is_key_pressed(KEY_F20),Input.is_key_pressed(KEY_F21),Input.is_key_pressed(KEY_F22),Input.is_key_pressed(KEY_F23),Input.is_key_pressed(KEY_F24),Input.is_key_pressed(KEY_F25),Input.is_key_pressed(KEY_F26),Input.is_key_pressed(KEY_F27),Input.is_key_pressed(KEY_F28),Input.is_key_pressed(KEY_F29),Input.is_key_pressed(KEY_F30),Input.is_key_pressed(KEY_F31),Input.is_key_pressed(KEY_F32),Input.is_key_pressed(KEY_F33),Input.is_key_pressed(KEY_F34),Input.is_key_pressed(KEY_F35),Input.is_key_pressed(KEY_KP_MULTIPLY),Input.is_key_pressed(KEY_KP_DIVIDE),Input.is_key_pressed(KEY_KP_SUBTRACT),Input.is_key_pressed(KEY_KP_PERIOD),Input.is_key_pressed(KEY_KP_ADD),Input.is_key_pressed(KEY_KP_0),Input.is_key_pressed(KEY_KP_1),Input.is_key_pressed(KEY_KP_2),Input.is_key_pressed(KEY_KP_3),Input.is_key_pressed(KEY_KP_4),Input.is_key_pressed(KEY_KP_5),Input.is_key_pressed(KEY_KP_6),Input.is_key_pressed(KEY_KP_7),Input.is_key_pressed(KEY_KP_8),Input.is_key_pressed(KEY_KP_9),Input.is_key_pressed(KEY_MENU),Input.is_key_pressed(KEY_HYPER),Input.is_key_pressed(KEY_HELP),Input.is_key_pressed(KEY_BACK),Input.is_key_pressed(KEY_FORWARD),Input.is_key_pressed(KEY_STOP),Input.is_key_pressed(KEY_REFRESH),Input.is_key_pressed(KEY_VOLUMEDOWN),Input.is_key_pressed(KEY_VOLUMEMUTE),Input.is_key_pressed(KEY_VOLUMEUP),Input.is_key_pressed(KEY_MEDIAPLAY),Input.is_key_pressed(KEY_MEDIASTOP),Input.is_key_pressed(KEY_MEDIAPREVIOUS),Input.is_key_pressed(KEY_MEDIANEXT),Input.is_key_pressed(KEY_MEDIARECORD),Input.is_key_pressed(KEY_HOMEPAGE),Input.is_key_pressed(KEY_FAVORITES),Input.is_key_pressed(KEY_SEARCH),Input.is_key_pressed(KEY_STANDBY),Input.is_key_pressed(KEY_OPENURL),Input.is_key_pressed(KEY_LAUNCHMAIL),Input.is_key_pressed(KEY_LAUNCHMEDIA),Input.is_key_pressed(KEY_LAUNCH0),Input.is_key_pressed(KEY_LAUNCH1),Input.is_key_pressed(KEY_LAUNCH2),Input.is_key_pressed(KEY_LAUNCH3),Input.is_key_pressed(KEY_LAUNCH4),Input.is_key_pressed(KEY_LAUNCH5),Input.is_key_pressed(KEY_LAUNCH6),Input.is_key_pressed(KEY_LAUNCH7),Input.is_key_pressed(KEY_LAUNCH8),Input.is_key_pressed(KEY_LAUNCH9),Input.is_key_pressed(KEY_LAUNCHA),Input.is_key_pressed(KEY_LAUNCHB),Input.is_key_pressed(KEY_LAUNCHC),Input.is_key_pressed(KEY_LAUNCHD),Input.is_key_pressed(KEY_LAUNCHE),Input.is_key_pressed(KEY_LAUNCHF),Input.is_key_pressed(KEY_UNKNOWN),Input.is_key_pressed(KEY_SPACE),Input.is_key_pressed(KEY_EXCLAM),Input.is_key_pressed(KEY_QUOTEDBL),Input.is_key_pressed(KEY_NUMBERSIGN),Input.is_key_pressed(KEY_DOLLAR),Input.is_key_pressed(KEY_PERCENT),Input.is_key_pressed(KEY_AMPERSAND),Input.is_key_pressed(KEY_APOSTROPHE),Input.is_key_pressed(KEY_PARENLEFT),Input.is_key_pressed(KEY_PARENRIGHT),Input.is_key_pressed(KEY_ASTERISK),Input.is_key_pressed(KEY_PLUS),Input.is_key_pressed(KEY_COMMA),Input.is_key_pressed(KEY_MINUS),Input.is_key_pressed(KEY_PERIOD),Input.is_key_pressed(KEY_SLASH),Input.is_key_pressed(KEY_0),Input.is_key_pressed(KEY_1),Input.is_key_pressed(KEY_2),Input.is_key_pressed(KEY_3),Input.is_key_pressed(KEY_4),Input.is_key_pressed(KEY_5),Input.is_key_pressed(KEY_6),Input.is_key_pressed(KEY_7),Input.is_key_pressed(KEY_8),Input.is_key_pressed(KEY_9),Input.is_key_pressed(KEY_COLON),Input.is_key_pressed(KEY_SEMICOLON),Input.is_key_pressed(KEY_LESS),Input.is_key_pressed(KEY_EQUAL),Input.is_key_pressed(KEY_GREATER),Input.is_key_pressed(KEY_QUESTION),Input.is_key_pressed(KEY_AT),Input.is_key_pressed(KEY_A),Input.is_key_pressed(KEY_B),Input.is_key_pressed(KEY_C),Input.is_key_pressed(KEY_D),Input.is_key_pressed(KEY_E),Input.is_key_pressed(KEY_F),Input.is_key_pressed(KEY_G),Input.is_key_pressed(KEY_H),Input.is_key_pressed(KEY_I),Input.is_key_pressed(KEY_J),Input.is_key_pressed(KEY_K),Input.is_key_pressed(KEY_L),Input.is_key_pressed(KEY_M),Input.is_key_pressed(KEY_N),Input.is_key_pressed(KEY_O),Input.is_key_pressed(KEY_P),Input.is_key_pressed(KEY_Q),Input.is_key_pressed(KEY_R),Input.is_key_pressed(KEY_S),Input.is_key_pressed(KEY_T),Input.is_key_pressed(KEY_U),Input.is_key_pressed(KEY_V),Input.is_key_pressed(KEY_W),Input.is_key_pressed(KEY_X),Input.is_key_pressed(KEY_Y),Input.is_key_pressed(KEY_Z),Input.is_key_pressed(KEY_BRACKETLEFT),Input.is_key_pressed(KEY_BACKSLASH),Input.is_key_pressed(KEY_BRACKETRIGHT),Input.is_key_pressed(KEY_ASCIICIRCUM),Input.is_key_pressed(KEY_UNDERSCORE),Input.is_key_pressed(KEY_QUOTELEFT),Input.is_key_pressed(KEY_BRACELEFT),Input.is_key_pressed(KEY_BAR),Input.is_key_pressed(KEY_BRACERIGHT),Input.is_key_pressed(KEY_ASCIITILDE),Input.is_key_pressed(KEY_YEN),Input.is_key_pressed(KEY_SECTION),Input.is_key_pressed(KEY_GLOBE),Input.is_key_pressed(KEY_KEYBOARD),Input.is_key_pressed(KEY_JIS_EISU),Input.is_key_pressed(KEY_JIS_KANA)]
 	
-	for position in joystick_pressed.size():
-		calculate_joystick(delta, position)
-func apply_keyboard_pressed(delta):
-	var array = [Input.is_key_pressed(KEY_NONE),Input.is_key_pressed(KEY_SPECIAL),Input.is_key_pressed(KEY_ESCAPE),Input.is_key_pressed(KEY_TAB),Input.is_key_pressed(KEY_BACKTAB),Input.is_key_pressed(KEY_BACKSPACE),Input.is_key_pressed(KEY_ENTER),Input.is_key_pressed(KEY_KP_ENTER),Input.is_key_pressed(KEY_INSERT),Input.is_key_pressed(KEY_DELETE),Input.is_key_pressed(KEY_PAUSE),Input.is_key_pressed(KEY_PRINT),Input.is_key_pressed(KEY_SYSREQ),Input.is_key_pressed(KEY_CLEAR),Input.is_key_pressed(KEY_HOME),Input.is_key_pressed(KEY_END),Input.is_key_pressed(KEY_LEFT),Input.is_key_pressed(KEY_UP),Input.is_key_pressed(KEY_RIGHT),Input.is_key_pressed(KEY_DOWN),Input.is_key_pressed(KEY_PAGEUP),Input.is_key_pressed(KEY_PAGEDOWN),Input.is_key_pressed(KEY_SHIFT),Input.is_key_pressed(KEY_CTRL),Input.is_key_pressed(KEY_META),Input.is_key_pressed(KEY_ALT),Input.is_key_pressed(KEY_CAPSLOCK),Input.is_key_pressed(KEY_NUMLOCK),Input.is_key_pressed(KEY_SCROLLLOCK),Input.is_key_pressed(KEY_F1),Input.is_key_pressed(KEY_F2),Input.is_key_pressed(KEY_F3),Input.is_key_pressed(KEY_F4),Input.is_key_pressed(KEY_F5),Input.is_key_pressed(KEY_F6),Input.is_key_pressed(KEY_F7),Input.is_key_pressed(KEY_F8),Input.is_key_pressed(KEY_F9),Input.is_key_pressed(KEY_F10),Input.is_key_pressed(KEY_F11),Input.is_key_pressed(KEY_F12),Input.is_key_pressed(KEY_F13),Input.is_key_pressed(KEY_F14),Input.is_key_pressed(KEY_F15),Input.is_key_pressed(KEY_F16),Input.is_key_pressed(KEY_F17),Input.is_key_pressed(KEY_F18),Input.is_key_pressed(KEY_F19),Input.is_key_pressed(KEY_F20),Input.is_key_pressed(KEY_F21),Input.is_key_pressed(KEY_F22),Input.is_key_pressed(KEY_F23),Input.is_key_pressed(KEY_F24),Input.is_key_pressed(KEY_F25),Input.is_key_pressed(KEY_F26),Input.is_key_pressed(KEY_F27),Input.is_key_pressed(KEY_F28),Input.is_key_pressed(KEY_F29),Input.is_key_pressed(KEY_F30),Input.is_key_pressed(KEY_F31),Input.is_key_pressed(KEY_F32),Input.is_key_pressed(KEY_F33),Input.is_key_pressed(KEY_F34),Input.is_key_pressed(KEY_F35),Input.is_key_pressed(KEY_KP_MULTIPLY),Input.is_key_pressed(KEY_KP_DIVIDE),Input.is_key_pressed(KEY_KP_SUBTRACT),Input.is_key_pressed(KEY_KP_PERIOD),Input.is_key_pressed(KEY_KP_ADD),Input.is_key_pressed(KEY_KP_0),Input.is_key_pressed(KEY_KP_1),Input.is_key_pressed(KEY_KP_2),Input.is_key_pressed(KEY_KP_3),Input.is_key_pressed(KEY_KP_4),Input.is_key_pressed(KEY_KP_5),Input.is_key_pressed(KEY_KP_6),Input.is_key_pressed(KEY_KP_7),Input.is_key_pressed(KEY_KP_8),Input.is_key_pressed(KEY_KP_9),Input.is_key_pressed(KEY_MENU),Input.is_key_pressed(KEY_HYPER),Input.is_key_pressed(KEY_HELP),Input.is_key_pressed(KEY_BACK),Input.is_key_pressed(KEY_FORWARD),Input.is_key_pressed(KEY_STOP),Input.is_key_pressed(KEY_REFRESH),Input.is_key_pressed(KEY_VOLUMEDOWN),Input.is_key_pressed(KEY_VOLUMEMUTE),Input.is_key_pressed(KEY_VOLUMEUP),Input.is_key_pressed(KEY_MEDIAPLAY),Input.is_key_pressed(KEY_MEDIASTOP),Input.is_key_pressed(KEY_MEDIAPREVIOUS),Input.is_key_pressed(KEY_MEDIANEXT),Input.is_key_pressed(KEY_MEDIARECORD),Input.is_key_pressed(KEY_HOMEPAGE),Input.is_key_pressed(KEY_FAVORITES),Input.is_key_pressed(KEY_SEARCH),Input.is_key_pressed(KEY_STANDBY),Input.is_key_pressed(KEY_OPENURL),Input.is_key_pressed(KEY_LAUNCHMAIL),Input.is_key_pressed(KEY_LAUNCHMEDIA),Input.is_key_pressed(KEY_LAUNCH0),Input.is_key_pressed(KEY_LAUNCH1),Input.is_key_pressed(KEY_LAUNCH2),Input.is_key_pressed(KEY_LAUNCH3),Input.is_key_pressed(KEY_LAUNCH4),Input.is_key_pressed(KEY_LAUNCH5),Input.is_key_pressed(KEY_LAUNCH6),Input.is_key_pressed(KEY_LAUNCH7),Input.is_key_pressed(KEY_LAUNCH8),Input.is_key_pressed(KEY_LAUNCH9),Input.is_key_pressed(KEY_LAUNCHA),Input.is_key_pressed(KEY_LAUNCHB),Input.is_key_pressed(KEY_LAUNCHC),Input.is_key_pressed(KEY_LAUNCHD),Input.is_key_pressed(KEY_LAUNCHE),Input.is_key_pressed(KEY_LAUNCHF),Input.is_key_pressed(KEY_UNKNOWN),Input.is_key_pressed(KEY_SPACE),Input.is_key_pressed(KEY_EXCLAM),Input.is_key_pressed(KEY_QUOTEDBL),Input.is_key_pressed(KEY_NUMBERSIGN),Input.is_key_pressed(KEY_DOLLAR),Input.is_key_pressed(KEY_PERCENT),Input.is_key_pressed(KEY_AMPERSAND),Input.is_key_pressed(KEY_APOSTROPHE),Input.is_key_pressed(KEY_PARENLEFT),Input.is_key_pressed(KEY_PARENRIGHT),Input.is_key_pressed(KEY_ASTERISK),Input.is_key_pressed(KEY_PLUS),Input.is_key_pressed(KEY_COMMA),Input.is_key_pressed(KEY_MINUS),Input.is_key_pressed(KEY_PERIOD),Input.is_key_pressed(KEY_SLASH),Input.is_key_pressed(KEY_0),Input.is_key_pressed(KEY_1),Input.is_key_pressed(KEY_2),Input.is_key_pressed(KEY_3),Input.is_key_pressed(KEY_4),Input.is_key_pressed(KEY_5),Input.is_key_pressed(KEY_6),Input.is_key_pressed(KEY_7),Input.is_key_pressed(KEY_8),Input.is_key_pressed(KEY_9),Input.is_key_pressed(KEY_COLON),Input.is_key_pressed(KEY_SEMICOLON),Input.is_key_pressed(KEY_LESS),Input.is_key_pressed(KEY_EQUAL),Input.is_key_pressed(KEY_GREATER),Input.is_key_pressed(KEY_QUESTION),Input.is_key_pressed(KEY_AT),Input.is_key_pressed(KEY_A),Input.is_key_pressed(KEY_B),Input.is_key_pressed(KEY_C),Input.is_key_pressed(KEY_D),Input.is_key_pressed(KEY_E),Input.is_key_pressed(KEY_F),Input.is_key_pressed(KEY_G),Input.is_key_pressed(KEY_H),Input.is_key_pressed(KEY_I),Input.is_key_pressed(KEY_J),Input.is_key_pressed(KEY_K),Input.is_key_pressed(KEY_L),Input.is_key_pressed(KEY_M),Input.is_key_pressed(KEY_N),Input.is_key_pressed(KEY_O),Input.is_key_pressed(KEY_P),Input.is_key_pressed(KEY_Q),Input.is_key_pressed(KEY_R),Input.is_key_pressed(KEY_S),Input.is_key_pressed(KEY_T),Input.is_key_pressed(KEY_U),Input.is_key_pressed(KEY_V),Input.is_key_pressed(KEY_W),Input.is_key_pressed(KEY_X),Input.is_key_pressed(KEY_Y),Input.is_key_pressed(KEY_Z),Input.is_key_pressed(KEY_BRACKETLEFT),Input.is_key_pressed(KEY_BACKSLASH),Input.is_key_pressed(KEY_BRACKETRIGHT),Input.is_key_pressed(KEY_ASCIICIRCUM),Input.is_key_pressed(KEY_UNDERSCORE),Input.is_key_pressed(KEY_QUOTELEFT),Input.is_key_pressed(KEY_BRACELEFT),Input.is_key_pressed(KEY_BAR),Input.is_key_pressed(KEY_BRACERIGHT),Input.is_key_pressed(KEY_ASCIITILDE),Input.is_key_pressed(KEY_YEN),Input.is_key_pressed(KEY_SECTION),Input.is_key_pressed(KEY_GLOBE),Input.is_key_pressed(KEY_KEYBOARD),Input.is_key_pressed(KEY_JIS_EISU),Input.is_key_pressed(KEY_JIS_KANA)]
-	if keyboard_pressed != array:
-		keyboard_pressed = array
-	for position in keyboard_pressed.size():
-		calculate_keyboard(delta, position)
+	if joystick_pressed != joystick_array:
+		joystick_pressed = joystick_array
+		current_device = Device.Joystick
+	
+	if joystick_motion != joystick_motion_array:
+		joystick_motion = joystick_motion_array
+		current_device = Device.Joystick
+	
+	if keyboard_pressed != keyboard_array:
+		keyboard_pressed = keyboard_array
+		current_device = Device.Keyboard
+	
+	if mouse_pressed != mouse_array:
+		mouse_pressed = mouse_array
+		current_device = Device.Mouse
+	
+	if mouse_motion != mouse_motion_var:
+		mouse_motion = mouse_motion_var
+		current_device = Device.Mouse
 
 func set_mouse_values():
 	mouse_pressed.resize(Mouse_button.keys().size())
-	mouse_pressed.fill(false)
+	mouse_pressed = [Input.is_action_pressed("mouse_left"),Input.is_action_pressed("mouse_right"),Input.is_action_pressed("mouse_middle"),Input.is_action_pressed("mouse_wheel_up"),Input.is_action_pressed("mouse_wheel_down"),Input.is_action_pressed("mouse_wheel_left"),Input.is_action_pressed("mouse_wheel_right"),Input.is_action_pressed("mouse_xbutton_1"),Input.is_action_pressed("mouse_xbutton_2")]
 	mouse_current_doubleclick_time.resize(Mouse_button.keys().size())
 	mouse_current_doubleclick_time.fill(0.0)
 	mouse_current_doubleclick_amount.resize(Mouse_button.keys().size())
@@ -111,9 +124,10 @@ func set_mouse_values():
 	mouse_current_delay.fill(0.0)
 	mouse_action.resize(Mouse_button.keys().size())
 	mouse_action.fill(Action.Released)
+	mouse_motion = Input.get_last_mouse_velocity()
 func set_keyboard_values():
 	keyboard_pressed.resize(Keyboard_button.keys().size())
-	keyboard_pressed.fill(false)
+	keyboard_pressed = [Input.is_key_pressed(KEY_NONE),Input.is_key_pressed(KEY_SPECIAL),Input.is_key_pressed(KEY_ESCAPE),Input.is_key_pressed(KEY_TAB),Input.is_key_pressed(KEY_BACKTAB),Input.is_key_pressed(KEY_BACKSPACE),Input.is_key_pressed(KEY_ENTER),Input.is_key_pressed(KEY_KP_ENTER),Input.is_key_pressed(KEY_INSERT),Input.is_key_pressed(KEY_DELETE),Input.is_key_pressed(KEY_PAUSE),Input.is_key_pressed(KEY_PRINT),Input.is_key_pressed(KEY_SYSREQ),Input.is_key_pressed(KEY_CLEAR),Input.is_key_pressed(KEY_HOME),Input.is_key_pressed(KEY_END),Input.is_key_pressed(KEY_LEFT),Input.is_key_pressed(KEY_UP),Input.is_key_pressed(KEY_RIGHT),Input.is_key_pressed(KEY_DOWN),Input.is_key_pressed(KEY_PAGEUP),Input.is_key_pressed(KEY_PAGEDOWN),Input.is_key_pressed(KEY_SHIFT),Input.is_key_pressed(KEY_CTRL),Input.is_key_pressed(KEY_META),Input.is_key_pressed(KEY_ALT),Input.is_key_pressed(KEY_CAPSLOCK),Input.is_key_pressed(KEY_NUMLOCK),Input.is_key_pressed(KEY_SCROLLLOCK),Input.is_key_pressed(KEY_F1),Input.is_key_pressed(KEY_F2),Input.is_key_pressed(KEY_F3),Input.is_key_pressed(KEY_F4),Input.is_key_pressed(KEY_F5),Input.is_key_pressed(KEY_F6),Input.is_key_pressed(KEY_F7),Input.is_key_pressed(KEY_F8),Input.is_key_pressed(KEY_F9),Input.is_key_pressed(KEY_F10),Input.is_key_pressed(KEY_F11),Input.is_key_pressed(KEY_F12),Input.is_key_pressed(KEY_F13),Input.is_key_pressed(KEY_F14),Input.is_key_pressed(KEY_F15),Input.is_key_pressed(KEY_F16),Input.is_key_pressed(KEY_F17),Input.is_key_pressed(KEY_F18),Input.is_key_pressed(KEY_F19),Input.is_key_pressed(KEY_F20),Input.is_key_pressed(KEY_F21),Input.is_key_pressed(KEY_F22),Input.is_key_pressed(KEY_F23),Input.is_key_pressed(KEY_F24),Input.is_key_pressed(KEY_F25),Input.is_key_pressed(KEY_F26),Input.is_key_pressed(KEY_F27),Input.is_key_pressed(KEY_F28),Input.is_key_pressed(KEY_F29),Input.is_key_pressed(KEY_F30),Input.is_key_pressed(KEY_F31),Input.is_key_pressed(KEY_F32),Input.is_key_pressed(KEY_F33),Input.is_key_pressed(KEY_F34),Input.is_key_pressed(KEY_F35),Input.is_key_pressed(KEY_KP_MULTIPLY),Input.is_key_pressed(KEY_KP_DIVIDE),Input.is_key_pressed(KEY_KP_SUBTRACT),Input.is_key_pressed(KEY_KP_PERIOD),Input.is_key_pressed(KEY_KP_ADD),Input.is_key_pressed(KEY_KP_0),Input.is_key_pressed(KEY_KP_1),Input.is_key_pressed(KEY_KP_2),Input.is_key_pressed(KEY_KP_3),Input.is_key_pressed(KEY_KP_4),Input.is_key_pressed(KEY_KP_5),Input.is_key_pressed(KEY_KP_6),Input.is_key_pressed(KEY_KP_7),Input.is_key_pressed(KEY_KP_8),Input.is_key_pressed(KEY_KP_9),Input.is_key_pressed(KEY_MENU),Input.is_key_pressed(KEY_HYPER),Input.is_key_pressed(KEY_HELP),Input.is_key_pressed(KEY_BACK),Input.is_key_pressed(KEY_FORWARD),Input.is_key_pressed(KEY_STOP),Input.is_key_pressed(KEY_REFRESH),Input.is_key_pressed(KEY_VOLUMEDOWN),Input.is_key_pressed(KEY_VOLUMEMUTE),Input.is_key_pressed(KEY_VOLUMEUP),Input.is_key_pressed(KEY_MEDIAPLAY),Input.is_key_pressed(KEY_MEDIASTOP),Input.is_key_pressed(KEY_MEDIAPREVIOUS),Input.is_key_pressed(KEY_MEDIANEXT),Input.is_key_pressed(KEY_MEDIARECORD),Input.is_key_pressed(KEY_HOMEPAGE),Input.is_key_pressed(KEY_FAVORITES),Input.is_key_pressed(KEY_SEARCH),Input.is_key_pressed(KEY_STANDBY),Input.is_key_pressed(KEY_OPENURL),Input.is_key_pressed(KEY_LAUNCHMAIL),Input.is_key_pressed(KEY_LAUNCHMEDIA),Input.is_key_pressed(KEY_LAUNCH0),Input.is_key_pressed(KEY_LAUNCH1),Input.is_key_pressed(KEY_LAUNCH2),Input.is_key_pressed(KEY_LAUNCH3),Input.is_key_pressed(KEY_LAUNCH4),Input.is_key_pressed(KEY_LAUNCH5),Input.is_key_pressed(KEY_LAUNCH6),Input.is_key_pressed(KEY_LAUNCH7),Input.is_key_pressed(KEY_LAUNCH8),Input.is_key_pressed(KEY_LAUNCH9),Input.is_key_pressed(KEY_LAUNCHA),Input.is_key_pressed(KEY_LAUNCHB),Input.is_key_pressed(KEY_LAUNCHC),Input.is_key_pressed(KEY_LAUNCHD),Input.is_key_pressed(KEY_LAUNCHE),Input.is_key_pressed(KEY_LAUNCHF),Input.is_key_pressed(KEY_UNKNOWN),Input.is_key_pressed(KEY_SPACE),Input.is_key_pressed(KEY_EXCLAM),Input.is_key_pressed(KEY_QUOTEDBL),Input.is_key_pressed(KEY_NUMBERSIGN),Input.is_key_pressed(KEY_DOLLAR),Input.is_key_pressed(KEY_PERCENT),Input.is_key_pressed(KEY_AMPERSAND),Input.is_key_pressed(KEY_APOSTROPHE),Input.is_key_pressed(KEY_PARENLEFT),Input.is_key_pressed(KEY_PARENRIGHT),Input.is_key_pressed(KEY_ASTERISK),Input.is_key_pressed(KEY_PLUS),Input.is_key_pressed(KEY_COMMA),Input.is_key_pressed(KEY_MINUS),Input.is_key_pressed(KEY_PERIOD),Input.is_key_pressed(KEY_SLASH),Input.is_key_pressed(KEY_0),Input.is_key_pressed(KEY_1),Input.is_key_pressed(KEY_2),Input.is_key_pressed(KEY_3),Input.is_key_pressed(KEY_4),Input.is_key_pressed(KEY_5),Input.is_key_pressed(KEY_6),Input.is_key_pressed(KEY_7),Input.is_key_pressed(KEY_8),Input.is_key_pressed(KEY_9),Input.is_key_pressed(KEY_COLON),Input.is_key_pressed(KEY_SEMICOLON),Input.is_key_pressed(KEY_LESS),Input.is_key_pressed(KEY_EQUAL),Input.is_key_pressed(KEY_GREATER),Input.is_key_pressed(KEY_QUESTION),Input.is_key_pressed(KEY_AT),Input.is_key_pressed(KEY_A),Input.is_key_pressed(KEY_B),Input.is_key_pressed(KEY_C),Input.is_key_pressed(KEY_D),Input.is_key_pressed(KEY_E),Input.is_key_pressed(KEY_F),Input.is_key_pressed(KEY_G),Input.is_key_pressed(KEY_H),Input.is_key_pressed(KEY_I),Input.is_key_pressed(KEY_J),Input.is_key_pressed(KEY_K),Input.is_key_pressed(KEY_L),Input.is_key_pressed(KEY_M),Input.is_key_pressed(KEY_N),Input.is_key_pressed(KEY_O),Input.is_key_pressed(KEY_P),Input.is_key_pressed(KEY_Q),Input.is_key_pressed(KEY_R),Input.is_key_pressed(KEY_S),Input.is_key_pressed(KEY_T),Input.is_key_pressed(KEY_U),Input.is_key_pressed(KEY_V),Input.is_key_pressed(KEY_W),Input.is_key_pressed(KEY_X),Input.is_key_pressed(KEY_Y),Input.is_key_pressed(KEY_Z),Input.is_key_pressed(KEY_BRACKETLEFT),Input.is_key_pressed(KEY_BACKSLASH),Input.is_key_pressed(KEY_BRACKETRIGHT),Input.is_key_pressed(KEY_ASCIICIRCUM),Input.is_key_pressed(KEY_UNDERSCORE),Input.is_key_pressed(KEY_QUOTELEFT),Input.is_key_pressed(KEY_BRACELEFT),Input.is_key_pressed(KEY_BAR),Input.is_key_pressed(KEY_BRACERIGHT),Input.is_key_pressed(KEY_ASCIITILDE),Input.is_key_pressed(KEY_YEN),Input.is_key_pressed(KEY_SECTION),Input.is_key_pressed(KEY_GLOBE),Input.is_key_pressed(KEY_KEYBOARD),Input.is_key_pressed(KEY_JIS_EISU),Input.is_key_pressed(KEY_JIS_KANA)]
 	keyboard_current_doubleclick_time.resize(Keyboard_button.keys().size())
 	keyboard_current_doubleclick_time.fill(0.0)
 	keyboard_current_doubleclick_amount.resize(Keyboard_button.keys().size())
@@ -126,9 +140,9 @@ func set_keyboard_values():
 	keyboard_action.fill(KeyboardAction.Released)
 func set_joystick_values():
 	joystick_pressed.resize(Joystick_button.keys().size())
-	joystick_pressed.fill(false)
+	joystick_pressed = [Input.is_action_pressed("joystick_a"),Input.is_action_pressed("joystick_b"),Input.is_action_pressed("joystick_x"),Input.is_action_pressed("joystick_y"),Input.is_action_pressed("joystick_lb"),Input.is_action_pressed("joystick_rb"),Input.is_action_pressed("joystick_lt"),Input.is_action_pressed("joystick_rt"),Input.is_action_pressed("joystick_start"),Input.is_action_pressed("joystick_back"),Input.is_action_pressed("joystick_connection_button"),Input.is_action_pressed("joystick_laxis_button"),Input.is_action_pressed("joystick_raxis_button"),Input.is_action_pressed("joystick_dpad_up"),Input.is_action_pressed("joystick_dpad_down"),Input.is_action_pressed("joystick_dpad_left"),Input.is_action_pressed("joystick_dpad_right"),Input.is_action_pressed("joystick_laxis_up"),Input.is_action_pressed("joystick_laxis_down"),Input.is_action_pressed("joystick_laxis_left"),Input.is_action_pressed("joystick_laxis_right"),Input.is_action_pressed("joystick_raxis_up"),Input.is_action_pressed("joystick_raxis_down"),Input.is_action_pressed("joystick_raxis_left"),Input.is_action_pressed("joystick_raxis_right")]
 	joystick_motion.resize(Joystick_motion.keys().size())
-	joystick_motion.fill(0.0)
+	joystick_motion = [Input.get_action_raw_strength("joystick_lt"), Input.get_action_raw_strength("joystick_rt"), Input.get_action_raw_strength("joystick_laxis_up"), Input.get_action_raw_strength("joystick_laxis_down"), Input.get_action_raw_strength("joystick_laxis_left"), Input.get_action_raw_strength("joystick_laxis_right"), Input.get_action_raw_strength("joystick_raxis_up"), Input.get_action_raw_strength("joystick_raxis_down"), Input.get_action_raw_strength("joystick_raxis_left"), Input.get_action_raw_strength("joystick_raxis_right"), Vector2(Input.get_action_raw_strength("joystick_laxis_right") - Input.get_action_raw_strength("joystick_laxis_left"), Input.get_action_raw_strength("joystick_laxis_up") - Input.get_action_raw_strength("joystick_laxis_down")), Vector2(Input.get_action_raw_strength("joystick_raxis_right") - Input.get_action_raw_strength("joystick_raxis_left"), Input.get_action_raw_strength("joystick_raxis_up") - Input.get_action_raw_strength("joystick_raxis_down"))]
 	joystick_current_doubleclick_time.resize(Joystick_button.keys().size())
 	joystick_current_doubleclick_time.fill(0.0)
 	joystick_current_doubleclick_amount.resize(Joystick_button.keys().size())
@@ -156,11 +170,8 @@ func _ready():
 	set_joystick_delay_globally(0.25)
 	set_joystick_doubleclick_globally(1, 2)
 	set_joystick_axis_radius_globally(Joystick_motion.LAXIS, 0.3)
-	
-	keyboard_pressed.resize(Keyboard_button.keys().size())
-	keyboard_pressed.fill(false)
-	joystick_pressed.resize(Joystick_button.keys().size())
-	joystick_pressed.fill(false)
+
+	current_device = default_device
 
 func mouse_button_just_pressed(button: Mouse_button):
 	return true if mouse_action[button] == Action.JustPressed else false
@@ -465,20 +476,17 @@ func set_device_reseting_values_on_switch(change: bool):
 	reset_values = change
 
 func _process(delta):
-	if current_device == Device.Mouse: return apply_mouse_pressed(delta)
-	if current_device == Device.Keyboard: return apply_keyboard_pressed(delta)
-	if current_device == Device.Joystick: return apply_joystick_pressed(delta)
-
-func _unhandled_input(event):
-	# Detecting what device has been active. On "current_device", whenever
-	# the variable has been updated, it'll apply resets to the not current device
-	# variables.
-	if event is InputEventMouseButton or event is InputEventMouseMotion:
-		if current_device != Device.Mouse: current_device = Device.Mouse
-	if event is InputEventKey:
-		if current_device != Device.Keyboard: current_device = Device.Keyboard
-	if event is InputEventJoypadButton or event is InputEventJoypadMotion:
-		if current_device != Device.Joystick: current_device = Device.Joystick
+	apply_input_pressed(delta)
+	
+	if current_device == Device.Mouse: 
+		for position in mouse_pressed.size():
+			calculate_mouse(delta, position)
+	elif current_device == Device.Keyboard:
+		for position in keyboard_pressed.size():
+			calculate_keyboard(delta, position)
+	elif current_device == Device.Joystick:
+		for position in joystick_pressed.size():
+			calculate_joystick(delta, position)
 
 func calculate_mouse(delta, position):
 	var action = mouse_action[position]

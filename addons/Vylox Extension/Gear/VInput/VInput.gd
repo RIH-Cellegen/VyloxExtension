@@ -465,9 +465,6 @@ func set_device_reseting_values_on_switch(change: bool):
 	reset_values = change
 
 func _process(delta):
-	
-	if mouse_button_doubleclicked(Mouse_button.LEFT): print("mouse doubleclicked")
-	if joystick_button_doubleclicked(Joystick_button.A): print("joystick doubleclicked")
 	if current_device == Device.Mouse: return apply_mouse_pressed(delta)
 	if current_device == Device.Keyboard: return apply_keyboard_pressed(delta)
 	if current_device == Device.Joystick: return apply_joystick_pressed(delta)

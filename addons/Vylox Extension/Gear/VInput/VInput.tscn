@@ -1,6 +1,0 @@
-[gd_scene load_steps=2 format=3 uid="uid://boj6ikeox22r5"]
-
-[ext_resource type="Script" path="res://addons/Vylox Extension/Gear/VInput/VInput.gd" id="1_5v2ku"]
-
-[node name="VInput" type="Node"]
-script = ExtResource("1_5v2ku")

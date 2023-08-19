@@ -1,0 +1,30 @@
+[gd_scene load_steps=3 format=3 uid="uid://be6d57rm1iowv"]
+
+[ext_resource type="Script" path="res://addons/vylox_extension/Classes/VInput/VInput.gd" id="1_wewpm"]
+[ext_resource type="JSON" path="res://addons/vylox_extension/Resources/JSON Files/VInput_Test.json" id="2_5ek1y"]
+
+[node name="VInput" type="Node"]
+script = ExtResource("1_wewpm")
+config_path = ExtResource("2_5ek1y")
+save_config = false
+load_config = false
+reset_to_default_settings = false
+working = false
+m_delay_input_choise = 1
+m_delay_value_for_all_mouse_inputs = 0.5
+m_doubleclick_time_input_choise = 1
+m_doubleclick_time_value_for_all_mouse_inputs = 0.75
+m_doubleclick_amount_input_choise = 1
+m_doubleclick_amount_value_for_all_mouse_inputs = 2.0
+k_doubleclick_time_input_choise = 1
+k_doubleclick_time_value_for_all_keyboard_inputs = 0.75
+k_doubleclick_amount_input_choise = 1
+k_doubleclick_amount_value_for_all_keyboard_inputs = 2.0
+j_delay_input_choise = 1
+j_delay_value_for_all_joystick_buttons = 0.5
+j_doubleclick_time_input_choise = 1
+j_doubleclick_time_value_for_all_joystick_buttons = 0.75
+j_doubleclick_amount_input_choise = 1
+j_doubleclick_amount_value_for_all_joystick_buttons = 2.0
+j_motion_button_category = 3
+j_motion_radius_for_all_stick_sides = 0.2
